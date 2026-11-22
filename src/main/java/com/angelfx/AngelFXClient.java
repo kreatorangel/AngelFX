@@ -1,6 +1,8 @@
 package com.angelfx;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import java.io.IOException;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -42,11 +44,21 @@ public final class AngelFXClient implements ClientModInitializer {
         "Vanilla", "Celestial", "Galaxy", "Aurora", "Soul", "Sunset"
     };
 
-    @Override
-    public void onInitializeClient() {
-        KeyMapping.Category category = KeyMapping.Category.register(
-            Identifier.fromNamespaceAndPath(MOD_ID, "main")
-        );
+      @Override
+      public void onInitializeClient() {
+
+      try {
+        AngelFXLyrics.initialize(FabricLoader.getInstance().getConfigDir());
+        AngelFXLyrics.loadFirstAvailable();
+      } catch (IOException e) {
+        System.err.println("[AngelFX] Error al cargar las letras:");
+        e.printStackTrace();
+     }
+
+       KeyMapping.Category category = KeyMapping.Category.register(
+         Identifier.fromNamespaceAndPath(MOD_ID, "main")
+     );
+       
 
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "key.angelfx.toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, category
