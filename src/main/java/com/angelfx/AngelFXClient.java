@@ -15,8 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * AngelFX is deliberately client-only. It only adds cosmetic particles to the
- * local ClientLevel and never sends packets or changes server-side state.
+ * AngelFX is client-only. Its cosmetic particles are spawned locally.
  */
 public final class AngelFXClient implements ClientModInitializer {
     private static final String MOD_ID = "angelfx";
@@ -26,8 +25,11 @@ public final class AngelFXClient implements ClientModInitializer {
 
     private static KeyMapping toggleKey;
     private static KeyMapping modeKey;
+    private static KeyMapping menuKey;
+
     private static boolean enabled = true;
     private static int mode = 0;
+    private static int skyMode = 0;
     private static long ticks = 0;
 
     private static final ParticleOptions[][] PALETTES = new ParticleOptions[][] {
@@ -36,6 +38,9 @@ public final class AngelFXClient implements ClientModInitializer {
         { ParticleTypes.ELECTRIC_SPARK, ParticleTypes.WITCH, ParticleTypes.SOUL_FIRE_FLAME }
     };
     private static final String[] MODE_NAMES = { "Celestial", "Soul", "Arcane" };
+    private static final String[] SKY_NAMES = {
+        "Vanilla", "Celestial", "Galaxy", "Aurora", "Soul", "Sunset"
+    };
 
     @Override
     public void onInitializeClient() {
@@ -44,22 +49,25 @@ public final class AngelFXClient implements ClientModInitializer {
         );
 
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-            "key.angelfx.toggle",
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_G,
-            category
+            "key.angelfx.toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, category
         ));
         modeKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-            "key.angelfx.mode",
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_H,
-            category
+            "key.angelfx.mode", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_H, category
+        ));
+        menuKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+            "key.angelfx.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_M, category
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(AngelFXClient::onClientTick);
     }
 
     private static void onClientTick(Minecraft client) {
+        while (menuKey.consumeClick()) {
+            if (client.screen == null) {
+                client.setScreen(new AngelFXScreen());
+            }
+        }
+
         while (toggleKey.consumeClick()) {
             enabled = !enabled;
             if (client.player != null) {
@@ -73,7 +81,7 @@ public final class AngelFXClient implements ClientModInitializer {
             mode = (mode + 1) % MODE_NAMES.length;
             if (client.player != null) {
                 client.player.displayClientMessage(Component.literal(
-                    "§bAngelFX §7» §fModo: §d" + MODE_NAMES[mode]
+                    "§bAngelFX §7» §fPartículas: §d" + MODE_NAMES[mode]
                 ), true);
             }
         }
@@ -87,9 +95,36 @@ public final class AngelFXClient implements ClientModInitializer {
         if (ticks % AURA_INTERVAL == 0) {
             spawnAura(client, player);
         }
-        if (ticks % TRAIL_INTERVAL == 0 && player.onGround() && player.getDeltaMovement().horizontalDistanceSqr() > 0.0025) {
+        if (ticks % TRAIL_INTERVAL == 0 && player.onGround()
+                && player.getDeltaMovement().horizontalDistanceSqr() > 0.0025) {
             spawnTrail(client, player);
         }
+    }
+
+    static boolean isEnabled() {
+        return enabled;
+    }
+
+    static void setEnabled(boolean value) {
+        enabled = value;
+    }
+
+    static int getSkyMode() {
+        return skyMode;
+    }
+
+    static String getSkyName() {
+        return SKY_NAMES[skyMode];
+    }
+
+    static void setSkyMode(int value) {
+        if (value >= 0 && value < SKY_NAMES.length) {
+            skyMode = value;
+        }
+    }
+
+    static String[] getSkyNames() {
+        return SKY_NAMES.clone();
     }
 
     private static void spawnAura(Minecraft client, Player player) {
@@ -97,7 +132,6 @@ public final class AngelFXClient implements ClientModInitializer {
         double phase = ticks * 0.105;
         ParticleOptions[] palette = PALETTES[mode];
 
-        // Two staggered rings create a soft orbit around the player's legs/torso.
         for (int i = 0; i < 8; i++) {
             double angle = phase + (Math.PI * 2.0 * i / 8.0);
             double x = player.getX() + Math.cos(angle) * AURA_RADIUS;
@@ -126,4 +160,4 @@ public final class AngelFXClient implements ClientModInitializer {
             Mth.sin((float) ticks * 0.3F) * 0.008, 0.018,
             Mth.cos((float) ticks * 0.3F) * 0.008);
     }
-              }
+}
