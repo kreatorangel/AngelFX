@@ -1,1 +1,20 @@
-
+{
+  "schemaVersion": 1,
+  "id": "angelfx",
+  "version": "${version}",
+  "name": "AngelFX",
+  "description": "Lightweight client-side visual effects: rotating aura, energy particles and movement trails.",
+  "authors": ["AngelFX Team"],
+  "contact": {},
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.angelfx.AngelFXClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.1",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
