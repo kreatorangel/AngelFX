@@ -1,4 +1,4 @@
-# AngelFX 1.0.0
+# AngelFX 1.2.0
 
 Mod visual **exclusivamente cliente** para Minecraft Java 1.21.11 + Fabric.
 
@@ -16,6 +16,8 @@ Mod visual **exclusivamente cliente** para Minecraft Java 1.21.11 + Fabric.
 |---|---|
 | `G` | Activar/desactivar AngelFX |
 | `H` | Cambiar entre Celestial, Soul y Arcane |
+| `M` | Abrir el menú de AngelFX |
+| `?` | ? |
 
 Puedes cambiar las teclas desde los controles de Minecraft. Los efectos son locales: otros jugadores no los verán.
 
