@@ -3,7 +3,7 @@
   "id": "angelfx",
   "version": "${version}",
   "name": "AngelFX",
-  "description": "Lightweight client-side visual effects: rotating aura, energy particles and movement trails.",
+  "description": "Client-side visual particles and an in-game sky-style selector.",
   "authors": ["AngelFX Team"],
   "contact": {},
   "license": "MIT",
